@@ -1,0 +1,56 @@
+# Деплой на стейдж
+build:staging:
+  stage: build
+  only:
+    - development
+  script:
+    - npm install
+    # Build App
+    - npm run stage_build
+  artifacts:
+    paths:
+      # Build folder
+      - dist/
+    expire_in: 1 day
+  tags:
+    - stage
+deploy:staging:
+  stage: deploy
+  environment:
+    name: staging
+  script:
+    - \cp -rf dist/* /var/www/ktrsa-front/
+    - chown -R gitlab-runner:picom /var/www/ktrsa-front/
+  only:
+    - development
+  tags:
+    - stage
+
+#Деплой на прод
+build:production:
+  stage: build
+  only:
+    - master
+  script:
+    - npm install
+    # Build App
+    - npm run production_build
+  artifacts:
+    paths:
+      # Build folder
+      - dist/
+    expire_in: 1 week
+  tags:
+    - production
+deploy:production:
+  stage: deploy
+  environment:
+    name: production
+  script:
+    - \cp -rf dist/* /var/www/ktrsa-front/
+    - chown -R gitlab-runner:picom /var/www/ktrsa-front/
+  only:
+    - master
+  tags:
+    - production
+  when: manual
